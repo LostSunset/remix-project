@@ -1022,7 +1022,6 @@ export function Workspace() {
                       <Dropdown.Menu as={CustomMenu} className="w-100 custom-dropdown-items" data-id="custom-dropdown-items">
                         {
                           currentWorkspace !== LOCALHOST && <CreateDropDownMenuItem />
-
                         }
                         <Dropdown.Item
                           onClick={() => {
