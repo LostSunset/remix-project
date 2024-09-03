@@ -264,7 +264,7 @@ export const templates = (intl, plugin) => {
         await plugin.call('manager', 'activatePlugin', 'cookbookdev')
         plugin.call('menuicons', 'showContent', 'cookbookdev')
       },
-      onClickLabel: 'Open cookbook plugin',
+      onClickLabel: 'Explore more templates from Cookbook',
       items: [
         { value: "token-sale", displayName: 'Token Sale' },
         { value: "simple-nft-sale", displayName: 'Simple Nft Sale' },
