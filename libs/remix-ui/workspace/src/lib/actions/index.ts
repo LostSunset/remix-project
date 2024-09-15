@@ -672,8 +672,15 @@ const saveAs = (blob, name) => {
 export const moveFile = async (src: string, dest: string) => {
   const fileManager = plugin.fileManager
 
+  if (src === dest) return // if you cut and paste to the same location then no need to move anything
   try {
-    await fileManager.moveFile(src, dest)
+    const isFile = await fileManager.isFile(dest)
+    if (isFile) {
+      const updatedDestPath = await fileManager.currentPath()
+      await fileManager.moveFile(src, updatedDestPath)
+    } else {
+      await fileManager.moveFile(src, dest)
+    }
   } catch (error) {
     dispatch(displayPopUp('Oops! An error occurred while performing moveFile operation.' + error))
   }
@@ -682,8 +689,16 @@ export const moveFile = async (src: string, dest: string) => {
 export const moveFolder = async (src: string, dest: string) => {
   const fileManager = plugin.fileManager
 
+  if (src === dest) return // if you cut and paste to the same location then no need to move anything
+
   try {
-    await fileManager.moveDir(src, dest)
+    const isFile = await fileManager.isFile(dest)
+    if (!isFile) {
+      await fileManager.moveDir(src, dest)
+    } else {
+      const updatedDestPath = await fileManager.currentPath()
+      await fileManager.moveDir(src, updatedDestPath)
+    }
   } catch (error) {
     dispatch(displayPopUp('Oops! An error occurred while performing moveDir operation.' + error))
   }
