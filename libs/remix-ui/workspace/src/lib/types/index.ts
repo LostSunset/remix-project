@@ -6,7 +6,7 @@ import { RemixAppManager } from 'libs/remix-ui/plugin-manager/src/types'
 import { ViewPlugin } from '@remixproject/engine-web'
 import { appPlatformTypes } from '@remix-ui/app'
 import { Placement } from 'react-bootstrap/esm/Overlay'
-import { branch, GitHubUser } from '@remix-ui/git'
+import { branch } from '@remix-api'
 
 export type action = { name: string, type?: Array<WorkspaceElement>, path?: string[], extension?: string[], pattern?: string[], id: string, multiselect: boolean, label: string, sticky?: boolean, group: number, platform?: appPlatformTypes }
 export interface JSONStandardInput {
@@ -159,6 +159,8 @@ export interface FileExplorerProps {
     dragStatus: (status: boolean) => void
     importFromIpfs: any
     importFromHttps: any
+    connectToLocalFileSystem?: any
+    handleGitInit?: () => Promise<void>
     handleMultiCopies: any
     feTarget: { key: string, type: 'file' | 'folder' }[]
     setFeTarget: Dispatch<React.SetStateAction<{
@@ -180,6 +182,8 @@ export interface FileExplorerMenuProps {
   uploadFolder: (target: EventTarget & HTMLInputElement) => void
   importFromIpfs: any
   importFromHttps: any
+  connectToLocalFileSystem?: any
+  handleGitInit?: () => Promise<void>
   tooltipPlacement?: Placement
 }
 export interface FileExplorerContextMenuProps {
