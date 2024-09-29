@@ -94,7 +94,7 @@ export class RemixGuidePlugin extends ViewPlugin {
         <RemixUIGridView
           plugin={this}
           styleList={""}
-          logo='/assets/img/YouTubeLogo.webp'
+          logo='assets/img/YouTubeLogo.webp'
           enableFilter={true}
           showUntagged={true}
           showPin={false}
@@ -123,6 +123,7 @@ export class RemixGuidePlugin extends ViewPlugin {
                 return <RemixUIGridCell
                   plugin={this}
                   title={cell.title}
+                  titleTooltip={cell.titleTooltip}
                   tagList={cell.tagList}
                   classList='RGCellStyle'
                   expandViewEl={
@@ -135,8 +136,6 @@ export class RemixGuidePlugin extends ViewPlugin {
                     this.videoID = cell.expandViewElement.videoID
                     this.renderComponent()
                   }}
-                  logo={cell.expandViewElement.logo}
-                  logoURL={"https://www.youtube.com/@" + cell.authorURL}
                 >
                   <img src={"//img.youtube.com/vi/" + cell.expandViewElement.videoID + "/0.jpg"} style={{ height: '100px', width: 'fit-content' }}></img>
                 </RemixUIGridCell>
