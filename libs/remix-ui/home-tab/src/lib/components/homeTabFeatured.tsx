@@ -18,6 +18,11 @@ function HomeTabFeatured(props:HomeTabFeaturedProps) {
     props.plugin.verticalIcons.select('LearnEth')
     _paq.push(['trackEvent', 'hometab', 'featuredSection', 'LearnEth'])
   }
+  const handleStartRemixGuide = async () => {
+    _paq.push(['trackEvent', 'hometab', 'featuredSection', 'watchOnRemixGuide'])
+    await props.plugin.appManager.activatePlugin(['remixGuide'])
+    await props.plugin.call('tabs', 'focus', 'remixGuide')
+  }
   return (
     <div className="pt-1 pl-2" id="hTFeaturedeSection">
       <div className="mb-2 remix_ui-carousel-container">
@@ -80,19 +85,18 @@ function HomeTabFeatured(props:HomeTabFeaturedProps) {
                   <div style={{ fontSize: '0.8rem', lineHeight: '1.25rem' }} className="mb-3">
                     <FormattedMessage id="home.learnEthPromoText" />
                   </div>
-                  <span
+                  <button
                     className="remixui_home_text btn-sm btn-secondary mt-2 text-decoration-none mb-3"
-                    style={{ cursor: 'pointer' }}
                     onClick={()=>handleStartLearneth()}
                   >
                     <FormattedMessage id="home.learnEthPromoButton" />
-                  </span>
+                  </button>
                 </div>
               </div>
               <div className="mr-1 pr-1 d-flex align-items-center justify-content-center h-100">
-                <a href="https://www.youtube.com/@EthereumRemix/videos" target="__blank">
+                <button className="btn" onClick={() => handleStartRemixGuide()}>
                   <img src={'assets/img/YouTubeLogo.webp'} className="remixui_carouselImage" alt=""></img>
-                </a>
+                </button>
                 <div className="h6 w-50 p-2 pl-4  align-self-center" style={{ flex: '1' }}>
                   <h5>
                     <FormattedMessage id="home.remixYouTube" />
@@ -103,38 +107,12 @@ function HomeTabFeatured(props:HomeTabFeaturedProps) {
                   <div style={{ fontSize: '0.8rem' }} className="mb-3">
                     <FormattedMessage id="home.remixYouTubeText2" />
                   </div>
-                  <a
+                  <button
                     className="remixui_home_text btn-sm btn-secondary mt-2 text-decoration-none mb-3"
-                    onClick={() => _paq.push(['trackEvent', 'hometab', 'featuredSection', 'youTubeMore'])}
-                    target="__blank"
-                    href="https://www.youtube.com/@EthereumRemix/videos"
+                    onClick={() => handleStartRemixGuide()}
                   >
                     <FormattedMessage id="home.remixYouTubeMore" />
-                  </a>
-                </div>
-              </div>
-              <div className="mr-1 pr-1 d-flex align-items-center justify-content-center h-100">
-                <a href="https://docs.google.com/forms/d/e/1FAIpQLSd0WsJnKbeJo-BGrnf7WijxAdmE4PnC_Z4M0IApbBfHLHZdsQ/viewform" target="__blank">
-                  <img src={'assets/img/remixRewardBetaTester_small.webp'} className="remixui_carouselImage_remixbeta" alt=""></img>
-                </a>
-                <div className="h6 w-50 p-2 pl-4  align-self-center" style={{ flex: '1' }}>
-                  <h5>
-                    <FormattedMessage id="home.betaTesting" />
-                  </h5>
-                  <p style={{ fontStyle: 'italic', fontSize: '1rem' }}>
-                    <FormattedMessage id="home.betaTestingText1" />
-                  </p>
-                  <div style={{ fontSize: '0.8rem' }} className="mb-3">
-                    <FormattedMessage id="home.betaTestingText2" />
-                  </div>
-                  <a
-                    className="remixui_home_text btn-sm btn-secondary mt-2 text-decoration-none mb-3"
-                    onClick={() => _paq.push(['trackEvent', 'hometab', 'featuredSection', 'betatesting'])}
-                    target="__blank"
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSd0WsJnKbeJo-BGrnf7WijxAdmE4PnC_Z4M0IApbBfHLHZdsQ/viewform"
-                  >
-                    <FormattedMessage id="home.betaTestingMore" />
-                  </a>
+                  </button>
                 </div>
               </div>
             </Carousel>

@@ -29,9 +29,6 @@ if (version.includes('beta')) {
   channel = 'Insiders';
 }
 
-// Determine if running on CircleCI or locally with --e2e-local
-const isLocalE2E = process.argv.includes('--e2e-local') && !process.env.CIRCLECI;
-
 module.exports = {
     src_folders: ['build-e2e/remixdesktop/test/tests/app'],
     output_folder: './reports/tests',
@@ -45,7 +42,7 @@ module.exports = {
         selenium_host: 'localhost',
         globals: {
           waitForConditionTimeout: 10000,
-          asyncHookTimeout: 100000
+          asyncHookTimeout: 30000
         },
         screenshots: {
           enabled: true,

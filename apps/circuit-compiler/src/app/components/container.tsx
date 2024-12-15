@@ -73,16 +73,20 @@ export function Container () {
           full circom error: ${JSON.stringify(report, null, 2)}
           explain why the error occurred and how to fix it.
           `
-        // @ts-ignore
-        await circuitApp.plugin.call('solcoder', 'error_explaining', message)
+        await circuitApp.plugin.call('popupPanel' as any, 'showPopupPanel', true)
+        setTimeout(async () => {
+          await circuitApp.plugin.call('remixAI' as any, 'chatPipe', 'error_explaining', message)
+        }, 500)
       } else {
         const message = `
           error message: ${error}
           full circom error: ${JSON.stringify(report, null, 2)}
           explain why the error occurred and how to fix it.
           `
-        // @ts-ignore
-        await circuitApp.plugin.call('solcoder', 'error_explaining', message)
+        await circuitApp.plugin.call('popupPanel' as any, 'showPopupPanel', true)
+        setTimeout(async () => {
+          await circuitApp.plugin.call('remixAI' as any, 'chatPipe', 'error_explaining', message)
+        }, 500)
       }
     } else {
       const error = report.message
@@ -91,8 +95,10 @@ export function Container () {
       full circom error: ${JSON.stringify(report, null, 2)}
       explain why the error occurred and how to fix it.
       `
-      // @ts-ignore
-      await circuitApp.plugin.call('solcoder', 'error_explaining', message)
+      await circuitApp.plugin.call('popupPanel' as any, 'showPopupPanel', true)
+      setTimeout(async () => {
+        await circuitApp.plugin.call('remixAI' as any, 'chatPipe', 'error_explaining', message)
+      }, 500)
     }
   }
 
@@ -112,7 +118,7 @@ export function Container () {
             >
               <span className="far fa-file-certificate border-0 p-0 ml-2" onClick={() => showCompilerLicense()}></span>
             </CustomTooltip>
-            <VersionList setVersion={handleVersionSelect} versionList={circuitApp.appState.versionList} currentVersion={circuitApp.appState.version} />
+            <VersionList setVersion={handleVersionSelect} versionList={circuitApp.appState.versionList} currentVersion={circuitApp.appState.version} downloadList={circuitApp.appState.versionDownloadList} />
             <CompileOptions setCircuitAutoCompile={handleCircuitAutoCompile} setCircuitHideWarnings={handleCircuitHideWarnings} autoCompile={circuitApp.appState.autoCompile} hideWarnings={circuitApp.appState.hideWarnings} />
             <Toggler title='circuit.advancedConfigurations' dataId=''>
               <Configurations setPrimeValue={handlePrimeChange} primeValue={circuitApp.appState.primeValue} versionValue={circuitApp.appState.version} />

@@ -11,8 +11,10 @@ import { RipgrepPlugin } from './plugins/ripgrepPlugin';
 import { CompilerLoaderPlugin } from './plugins/compilerLoader';
 import { SlitherPlugin } from './plugins/slitherPlugin';
 import { AppUpdaterPlugin } from './plugins/appUpdater';
+import { RemixAIDesktopPlugin } from './plugins/remixAIDektop';
 import { FoundryPlugin } from './plugins/foundryPlugin';
 import { HardhatPlugin } from './plugins/hardhatPlugin';
+import { CircomElectronPlugin } from './plugins/circomElectronBasePlugin';
 import { isE2E } from './main';
 
 const engine = new Engine()
@@ -28,6 +30,8 @@ const slitherPlugin = new SlitherPlugin()
 const appUpdaterPlugin = new AppUpdaterPlugin()
 const foundryPlugin = new FoundryPlugin()
 const hardhatPlugin = new HardhatPlugin()
+const remixAIDesktopPlugin = new RemixAIDesktopPlugin()
+const circomPlugin = new CircomElectronPlugin()
 
 engine.register(appManager)
 engine.register(fsPlugin)
@@ -41,6 +45,8 @@ engine.register(slitherPlugin)
 engine.register(foundryPlugin)
 engine.register(appUpdaterPlugin)
 engine.register(hardhatPlugin)
+engine.register(remixAIDesktopPlugin)
+engine.register(circomPlugin)
 
 appManager.activatePlugin('electronconfig')
 appManager.activatePlugin('fs')

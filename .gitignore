@@ -66,6 +66,10 @@ apps/remixdesktop/build*/
 apps/remix-ide/src/assets/list.json
 apps/remix-ide/src/assets/esbuild.wasm
 apps/remixdesktop/build*
-apps/remixdesktop/reports/
+apps/remixdesktop/reports
 apps/remixdesktop/logs/
+apps/remixdesktop/bin/
+apps/remixdesktop/circom-download
+apps/remixdesktop/log_input_signals.txt
+apps/remixdesktop/log_input_signals_new.txt
 logs

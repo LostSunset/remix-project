@@ -315,7 +315,7 @@ export const RemixUiSettings = (props: RemixUiSettingsProps) => {
           </div>
           <div className="custom-control custom-checkbox mb-1">
             <input onChange={onchangeMatomoAnalytics} id="settingsMatomoAnalytics" type="checkbox" className="custom-control-input" checked={isMatomoChecked} />
-            <label className={`form-check-label custom-control-label align-middle ${getTextClass('settings/matomo-analytics')}`} htmlFor="settingsMatomoAnalytics">
+            <label data-id="label-matomo-settings" className={`form-check-label custom-control-label align-middle ${getTextClass('settings/matomo-analytics')}`} htmlFor="settingsMatomoAnalytics">
               <span>
                 <FormattedMessage id="settings.matomoAnalytics" />
               </span>
@@ -473,11 +473,11 @@ export const RemixUiSettings = (props: RemixUiSettingsProps) => {
           <span
             data-id="remix_ai_docs"
             id="remix_ai_docs"
-            className="btn pl-2 pr-0 py-0 d-inline ai-docs"
+            className="btn pl-2 pr-0 py-0 d-inline ai-docs text-dark"
             role='link'
             onClick={()=>{
               window.open("https://remix-ide.readthedocs.io/en/latest/ai.html")
-              _paq.push(['trackEvent', 'ai', 'solcoder', 'documentation'])
+              _paq.push(['trackEvent', 'ai', 'remixAI', 'documentation'])
             }}
           >
             <i aria-hidden="true" className="fas fa-book"></i>

@@ -12,6 +12,7 @@ import { SidePanel } from './app/components/side-panel'
 import { StatusBar } from './app/components/status-bar'
 import { HiddenPanel } from './app/components/hidden-panel'
 import { PinnedPanel } from './app/components/pinned-panel'
+import { PopupPanel } from './app/components/popup-panel'
 import { VerticalIcons } from './app/components/vertical-icons'
 import { LandingPage } from './app/ui/landing-page/landing-page'
 import { MainPanel } from './app/components/main-panel'
@@ -57,18 +58,17 @@ import { xtermPlugin } from './app/plugins/electron/xtermPlugin'
 import { ripgrepPlugin } from './app/plugins/electron/ripgrepPlugin'
 import { compilerLoaderPlugin, compilerLoaderPluginDesktop } from './app/plugins/electron/compilerLoaderPlugin'
 import { appUpdaterPlugin } from './app/plugins/electron/appUpdaterPlugin'
+import { remixAIDesktopPlugin } from './app/plugins/electron/remixAIDesktopPlugin' 
+import { RemixAIPlugin } from './app/plugins/remixAIPlugin'
 import { SlitherHandleDesktop } from './app/plugins/electron/slitherPlugin'
 import { SlitherHandle } from './app/files/slither-handle'
 import { FoundryHandle } from './app/files/foundry-handle'
 import { FoundryHandleDesktop } from './app/plugins/electron/foundryPlugin'
 import { HardhatHandle } from './app/files/hardhat-handle'
 import { HardhatHandleDesktop } from './app/plugins/electron/hardhatPlugin'
-
-import { SolCoder } from './app/plugins/solcoderAI'
+import { circomPlugin } from './app/plugins/electron/circomElectronPlugin'
 import { GitPlugin } from './app/plugins/git'
 import { Matomo } from './app/plugins/matomo'
-
-
 
 import { TemplatesSelectionPlugin } from './app/plugins/templates-selection/templates-selection-plugin'
 
@@ -78,6 +78,7 @@ const remixLib = require('@remix-project/remix-lib')
 
 import { QueryParams } from '@remix-project/remix-lib'
 import { SearchPlugin } from './app/tabs/search'
+import { ScriptRunnerUIPlugin } from './app/tabs/script-runner-ui'
 import { ElectronProvider } from './app/files/electronProvider'
 
 const Storage = remixLib.Storage
@@ -103,6 +104,7 @@ const Editor = require('./app/editor/editor')
 const Terminal = require('./app/panels/terminal')
 const { TabProxy } = require('./app/panels/tab-proxy.js')
 
+const _paq = (window._paq = window._paq || [])
 
 export class platformApi {
   get name() {
@@ -178,16 +180,24 @@ class AppComponent {
       '6fd22d6fe5549ad4c4d8fd3ca0b7816b.mod': 35 // remix desktop
     }
 
+    _paq.push(['trackEvent', 'App', 'load']);
     this.matomoConfAlreadySet = Registry.getInstance().get('config').api.exists('settings/matomo-analytics')
     this.matomoCurrentSetting = Registry.getInstance().get('config').api.get('settings/matomo-analytics')
 
-    let electronTracking = false
+    let electronTracking = window.electronAPI ? await window.electronAPI.canTrackMatomo() : false
 
-    if (window.electronAPI) {
-      electronTracking = await window.electronAPI.canTrackMatomo()
-    }
+    const lastMatomoCheck = window.localStorage.getItem('matomo-analytics-consent')
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-    this.showMatamo = (matomoDomains[window.location.hostname] || electronTracking) && !this.matomoConfAlreadySet
+    const e2eforceMatomoToShow = window.localStorage.getItem('showMatomo') && window.localStorage.getItem('showMatomo') === 'true'
+    const contextShouldShowMatomo = matomoDomains[window.location.hostname] || e2eforceMatomoToShow || electronTracking
+    const shouldRenewConsent = this.matomoCurrentSetting === false && (!lastMatomoCheck || new Date(Number(lastMatomoCheck)) < sixMonthsAgo) // it is set to false for more than 6 months.
+    this.showMatomo = contextShouldShowMatomo && (!this.matomoConfAlreadySet || shouldRenewConsent)        
+
+    if (this.showMatomo && shouldRenewConsent) {
+      _paq.push(['trackEvent', 'Matomo', 'refreshMatomoPermissions']);
+    }    
 
     this.walkthroughService = new WalkthroughService(appManager)
 
@@ -238,6 +248,9 @@ class AppComponent {
     //----- search
     const search = new SearchPlugin()
 
+    //---------------- Script Runner UI Plugin -------------------------
+    const scriptRunnerUI = new ScriptRunnerUIPlugin(this.engine)
+
     //---- templates
     const templates = new TemplatesPlugin()
 
@@ -261,7 +274,7 @@ class AppComponent {
     const contractFlattener = new ContractFlattener()
 
     // ----------------- AI --------------------------------------
-    const solcoder = new SolCoder()
+    const remixAI = new RemixAIPlugin(isElectron())
 
     // ----------------- import content service ------------------------
     const contentImport = new CompilerImports()
@@ -384,11 +397,12 @@ class AppComponent {
       contractFlattener,
       solidityScript,
       templates,
-      solcoder,
       git,
       pluginStateLogger,
       matomo,
-      templateSelection
+      templateSelection,
+      scriptRunnerUI,
+      remixAI
     ])
 
     //---- fs plugin
@@ -405,8 +419,12 @@ class AppComponent {
       this.engine.register([xterm])
       const ripgrep = new ripgrepPlugin()
       this.engine.register([ripgrep])
+      const circom = new circomPlugin()
+      this.engine.register([circom])
       const appUpdater = new appUpdaterPlugin()
       this.engine.register([appUpdater])
+      const remixAIDesktop = new remixAIDesktopPlugin()
+      this.engine.register([remixAIDesktop])
     }
 
     const compilerloader = isElectron() ? new compilerLoaderPluginDesktop() : new compilerLoaderPlugin()
@@ -435,6 +453,7 @@ class AppComponent {
     this.sidePanel = new SidePanel()
     this.hiddenPanel = new HiddenPanel()
     this.pinnedPanel = new PinnedPanel()
+    this.popupPanel = new PopupPanel()
 
     const pluginManagerComponent = new PluginManagerComponent(appManager, this.engine)
     const filePanel = new FilePanel(appManager, contentImport)
@@ -442,7 +461,7 @@ class AppComponent {
     const landingPage = new LandingPage(appManager, this.menuicons, fileManager, filePanel, contentImport)
     this.settings = new SettingsTab(Registry.getInstance().get('config').api, editor, appManager)
 
-    this.engine.register([this.menuicons, landingPage, this.hiddenPanel, this.sidePanel, this.statusBar, filePanel, pluginManagerComponent, this.settings, this.pinnedPanel])
+    this.engine.register([this.menuicons, landingPage, this.hiddenPanel, this.sidePanel, this.statusBar, filePanel, pluginManagerComponent, this.settings, this.pinnedPanel, this.popupPanel])
 
     // CONTENT VIEWS & DEFAULT PLUGINS
     const openZeppelinProxy = new OpenZeppelinProxy(blockchain)
@@ -525,6 +544,7 @@ class AppComponent {
     await this.appManager.activatePlugin(['statusBar'])
     await this.appManager.activatePlugin(['sidePanel']) // activating  host plugin separately
     await this.appManager.activatePlugin(['pinnedPanel'])
+    await this.appManager.activatePlugin(['popupPanel'])
     await this.appManager.activatePlugin(['home'])
     await this.appManager.activatePlugin(['settings', 'config'])
     await this.appManager.activatePlugin([
@@ -538,7 +558,8 @@ class AppComponent {
       'fetchAndCompile',
       'contentImport',
       'gistHandler',
-      'compilerloader'
+      'compilerloader',
+      'remixAI'
     ])
     await this.appManager.activatePlugin(['settings'])
 
@@ -546,7 +567,7 @@ class AppComponent {
     await this.appManager.activatePlugin(['solidity-script', 'remix-templates'])
 
     if (isElectron()) {
-      await this.appManager.activatePlugin(['isogit', 'electronconfig', 'electronTemplates', 'xterm', 'ripgrep', 'appUpdater', 'slither', 'foundry', 'hardhat'])
+      await this.appManager.activatePlugin(['isogit', 'electronconfig', 'electronTemplates', 'xterm', 'ripgrep', 'appUpdater', 'slither', 'foundry', 'hardhat', 'circom']) // 'remixAID'
     }
 
     this.appManager.on(
@@ -561,7 +582,6 @@ class AppComponent {
       }
     )
     await this.appManager.activatePlugin(['solidity-script'])
-    await this.appManager.activatePlugin(['solcoder'])
     await this.appManager.activatePlugin(['filePanel'])
 
     // Set workspace after initial activation
@@ -639,7 +659,7 @@ class AppComponent {
     })
 
     // activate solidity plugin
-    this.appManager.activatePlugin(['solidity', 'udapp', 'deploy-libraries', 'link-libraries', 'openzeppelin-proxy'])
+    this.appManager.activatePlugin(['solidity', 'udapp', 'deploy-libraries', 'link-libraries', 'openzeppelin-proxy', 'scriptRunnerBridge'])
   }
 }
 
